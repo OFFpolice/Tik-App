@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>TikTok Viewer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background: #0b0b0b;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .app {
+            width: 100%;
+            max-width: 480px;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .input-box {
+            display: flex;
+            gap: 10px;
+        }
+
+        input {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            outline: none;
+        }
+
+        button {
+            padding: 12px 16px;
+            border: none;
+            border-radius: 8px;
+            background: #e50914;
+            color: #ffffff;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #ff1a24;
+        }
+
+        .status {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #aaaaaa;
+        }
+
+        .result {
+            margin-top: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        video {
+            width: 100%;
+            border-radius: 12px;
+            margin-top: 10px;
+        }
+
+        .images {
+            margin-top: 15px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .images img {
+            width: 100%;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <h1>TikTok Viewer</h1>
+
+    <div class="input-box">
+        <input id="tiktokUrl" type="text" placeholder="Вставьте ссылку на TikTok">
+        <button id="loadBtn">Загрузить</button>
+    </div>
+
+    <div id="status" class="status"></div>
+
+    <div id="result" class="result hidden">
+        <p id="description"></p>
+        <video id="video" controls playsinline></video>
+        <div id="images" class="images"></div>
+    </div>
+</div>
+
+<script>
+    const input = document.getElementById("tiktokUrl");
+    const loadBtn = document.getElementById("loadBtn");
+    const statusEl = document.getElementById("status");
+    const resultEl = document.getElementById("result");
+    const videoEl = document.getElementById("video");
+    const descEl = document.getElementById("description");
+    const imagesEl = document.getElementById("images");
+
+    loadBtn.addEventListener("click", loadTikTok);
+
+    async function loadTikTok() {
+        const url = input.value.trim();
+
+        if (!url) {
+            setStatus("Введите ссылку на TikTok", true);
+            return;
+        }
+
+        resetUI();
+        setStatus("Загрузка...");
+
+        try {
+            const apiUrl = `https://tikwm.com/api/?url=${encodeURIComponent(url)}`;
+            const response = await fetch(apiUrl);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const data = await response.json();
+            if (data.code !== 0) throw new Error(data.msg || "Ошибка API");
+            renderResult(data.data);
+            setStatus("Готово");
+        } catch (e) {
+            setStatus(`Ошибка: ${e.message}`, true);
+        }
+    }
+
+    function renderResult(data) {
+        descEl.textContent = data.title || "No description";
+        videoEl.src = data.play;
+
+        imagesEl.innerHTML = "";
+        if (Array.isArray(data.images)) {
+            data.images.forEach(src => {
+                const img = document.createElement("img");
+                img.src = src;
+                imagesEl.appendChild(img);
+            });
+        }
+
+        resultEl.classList.remove("hidden");
+    }
+
+    function resetUI() {
+        resultEl.classList.add("hidden");
+        videoEl.src = "";
+        imagesEl.innerHTML = "";
+    }
+
+    function setStatus(text, error = false) {
+        statusEl.textContent = text;
+        statusEl.style.color = error ? "#ff4d4d" : "#aaaaaa";
+    }
+</script>
+
+</body>
+</html>
