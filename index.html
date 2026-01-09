@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!--<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -169,6 +169,277 @@
         statusEl.textContent = text;
         statusEl.style.color = error ? "#ff4d4d" : "#aaaaaa";
     }
+</script>
+
+</body>
+</html>-->
+
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>TikTok Media Save</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root {
+    --bg: #0a0a0d;
+    --glass: rgba(255,255,255,0.06);
+    --border: rgba(255,255,255,0.12);
+    --accent: #00f2ea;
+    --accent2: #ff0050;
+    --text: #ffffff;
+    --muted: #9ca3af;
+}
+
+* {
+    box-sizing: border-box;
+    font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at top, rgba(0,242,234,0.08), transparent 40%),
+        radial-gradient(circle at bottom, rgba(255,0,80,0.08), transparent 40%),
+        var(--bg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--text);
+}
+
+.app {
+    width: 100%;
+    max-width: 420px;
+    padding: 22px;
+}
+
+.card {
+    background: linear-gradient(
+        180deg,
+        rgba(255,255,255,0.08),
+        rgba(255,255,255,0.03)
+    );
+    backdrop-filter: blur(18px);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 22px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 22px;
+}
+
+.logo {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+}
+
+.logo span {
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+    margin-top: 6px;
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.input-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+input {
+    flex: 1;
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 16px;
+    color: var(--text);
+    outline: none;
+    font-size: 14px;
+}
+
+input::placeholder {
+    color: var(--muted);
+}
+
+input:focus {
+    border-color: var(--accent);
+}
+
+button {
+    padding: 14px 18px;
+    border-radius: 14px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    color: #000;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+
+button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 30px rgba(0,242,234,0.35);
+}
+
+.status {
+    margin-top: 14px;
+    font-size: 13px;
+    color: var(--muted);
+    min-height: 18px;
+}
+
+.status.error {
+    color: #ff6b6b;
+}
+
+.result {
+    margin-top: 20px;
+    animation: fadeIn .35s ease;
+}
+
+.hidden {
+    display: none;
+}
+
+video {
+    width: 100%;
+    border-radius: 16px;
+    background: #000;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+}
+
+.description {
+    margin-top: 12px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--muted);
+}
+
+.images {
+    margin-top: 14px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+}
+
+.images img {
+    width: 100%;
+    border-radius: 12px;
+    object-fit: cover;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+    <div class="card">
+        <div class="header">
+            <div class="logo">TikTok<span>Media</span>Save</div>
+            <div class="subtitle">Загрузка видео и изображений без водяного знака</div>
+        </div>
+
+        <div class="input-group">
+            <input id="tiktokUrl" type="text" placeholder="Вставьте ссылку на TikTok">
+            <button id="loadBtn">GO</button>
+        </div>
+
+        <div id="status" class="status"></div>
+
+        <div id="result" class="result hidden">
+            <video id="video" controls playsinline></video>
+            <div id="images" class="images"></div>
+            <div id="description" class="description"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+const input = document.getElementById("tiktokUrl");
+const loadBtn = document.getElementById("loadBtn");
+const statusEl = document.getElementById("status");
+const resultEl = document.getElementById("result");
+const videoEl = document.getElementById("video");
+const imagesEl = document.getElementById("images");
+const descEl = document.getElementById("description");
+
+loadBtn.addEventListener("click", loadTikTok);
+
+async function loadTikTok() {
+    const url = input.value.trim();
+    if (!url) {
+        setStatus("Введите ссылку на TikTok", true);
+        return;
+    }
+
+    resetUI();
+    setStatus("Загрузка...");
+
+    try {
+        const apiUrl = `https://tikwm.com/api/?url=${encodeURIComponent(url)}`;
+        const res = await fetch(apiUrl);
+        if (!res.ok) throw new Error("Ошибка сети");
+        const json = await res.json();
+        if (json.code !== 0) throw new Error(json.msg || "Ошибка API");
+
+        render(json.data);
+        setStatus("Готово");
+    } catch (e) {
+        setStatus(e.message, true);
+    }
+}
+
+function render(data) {
+    videoEl.src = data.play;
+    descEl.textContent = data.title || "";
+
+    imagesEl.innerHTML = "";
+    if (Array.isArray(data.images)) {
+        data.images.forEach(src => {
+            const img = document.createElement("img");
+            img.src = src;
+            imagesEl.appendChild(img);
+        });
+    }
+
+    resultEl.classList.remove("hidden");
+}
+
+function resetUI() {
+    resultEl.classList.add("hidden");
+    videoEl.src = "";
+    imagesEl.innerHTML = "";
+}
+
+function setStatus(text, error = false) {
+    statusEl.textContent = text;
+    statusEl.classList.toggle("error", error);
+}
 </script>
 
 </body>
