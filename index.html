@@ -175,74 +175,110 @@
 </html>-->
 
 
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TikTok Media Save</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
+/* =========================
+   DESIGN SYSTEM
+========================= */
 :root {
-    --bg: #0a0a0d;
-    --glass: rgba(255,255,255,0.06);
-    --border: rgba(255,255,255,0.12);
-    --accent: #00f2ea;
-    --accent2: #ff0050;
-    --text: #ffffff;
-    --muted: #9ca3af;
+    --bg-main: #0a0b0f;
+    --bg-glass: rgba(255,255,255,0.06);
+    --bg-glass-strong: rgba(255,255,255,0.10);
+
+    --border-soft: rgba(255,255,255,0.14);
+
+    --accent-primary: #00f2ea;
+    --accent-secondary: #ff0050;
+
+    --text-main: #ffffff;
+    --text-muted: #9ca3af;
+    --text-error: #ff6b6b;
+
+    --radius-sm: 10px;
+    --radius-md: 16px;
+    --radius-lg: 22px;
+
+    --transition-fast: .15s ease;
+    --transition-base: .25s ease;
 }
 
-* {
+/* =========================
+   RESET & BASE
+========================= */
+*,
+*::before,
+*::after {
     box-sizing: border-box;
-    font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-body {
+html, body {
     margin: 0;
-    min-height: 100vh;
+    padding: 0;
+    min-height: 100%;
     background:
         radial-gradient(circle at top, rgba(0,242,234,0.08), transparent 40%),
         radial-gradient(circle at bottom, rgba(255,0,80,0.08), transparent 40%),
-        var(--bg);
+        var(--bg-main);
+    color: var(--text-main);
+    font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* =========================
+   LAYOUT
+========================= */
+.app {
+    min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    color: var(--text);
+    padding: 16px;
 }
 
-.app {
+.container {
     width: 100%;
     max-width: 420px;
-    padding: 22px;
 }
 
 .card {
     background: linear-gradient(
         180deg,
-        rgba(255,255,255,0.08),
-        rgba(255,255,255,0.03)
+        var(--bg-glass-strong),
+        var(--bg-glass)
     );
     backdrop-filter: blur(18px);
-    border: 1px solid var(--border);
-    border-radius: 20px;
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-lg);
     padding: 22px;
-    box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+    box-shadow: 0 30px 80px rgba(0,0,0,.65);
 }
 
+/* =========================
+   HEADER
+========================= */
 .header {
     text-align: center;
     margin-bottom: 22px;
 }
 
-.logo {
+.title {
     font-size: 22px;
     font-weight: 700;
-    letter-spacing: 0.4px;
+    letter-spacing: .4px;
 }
 
-.logo span {
-    background: linear-gradient(90deg, var(--accent), var(--accent2));
+.title span {
+    background: linear-gradient(
+        90deg,
+        var(--accent-primary),
+        var(--accent-secondary)
+    );
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -250,82 +286,102 @@ body {
 .subtitle {
     margin-top: 6px;
     font-size: 13px;
-    color: var(--muted);
+    color: var(--text-muted);
 }
 
-.input-group {
+/* =========================
+   FORM
+========================= */
+.form {
     display: flex;
     gap: 10px;
     margin-top: 18px;
 }
 
-input {
+.input {
     flex: 1;
-    background: var(--glass);
-    border: 1px solid var(--border);
-    border-radius: 14px;
+    background: var(--bg-glass);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
     padding: 14px 16px;
-    color: var(--text);
-    outline: none;
     font-size: 14px;
+    color: var(--text-main);
+    outline: none;
+    transition: border var(--transition-fast);
 }
 
-input::placeholder {
-    color: var(--muted);
+.input::placeholder {
+    color: var(--text-muted);
 }
 
-input:focus {
-    border-color: var(--accent);
+.input:focus {
+    border-color: var(--accent-primary);
 }
 
-button {
+.button {
     padding: 14px 18px;
-    border-radius: 14px;
+    border-radius: var(--radius-md);
     border: none;
     cursor: pointer;
     font-weight: 600;
     color: #000;
-    background: linear-gradient(90deg, var(--accent), var(--accent2));
-    transition: transform .15s ease, box-shadow .15s ease;
+    background: linear-gradient(
+        90deg,
+        var(--accent-primary),
+        var(--accent-secondary)
+    );
+    transition:
+        transform var(--transition-fast),
+        box-shadow var(--transition-fast);
 }
 
-button:hover {
+.button:hover {
     transform: translateY(-1px);
-    box-shadow: 0 8px 30px rgba(0,242,234,0.35);
+    box-shadow: 0 10px 30px rgba(0,242,234,.35);
 }
 
+.button:active {
+    transform: translateY(0);
+}
+
+/* =========================
+   STATUS
+========================= */
 .status {
+    min-height: 18px;
     margin-top: 14px;
     font-size: 13px;
-    color: var(--muted);
-    min-height: 18px;
+    color: var(--text-muted);
 }
 
 .status.error {
-    color: #ff6b6b;
+    color: var(--text-error);
 }
 
+/* =========================
+   RESULT
+========================= */
 .result {
     margin-top: 20px;
-    animation: fadeIn .35s ease;
+    animation: fade-in .3s ease;
 }
 
 .hidden {
     display: none;
 }
 
-video {
+.video {
     width: 100%;
-    border-radius: 16px;
+    border-radius: var(--radius-md);
     background: #000;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+    box-shadow: 0 12px 40px rgba(0,0,0,.6);
 }
 
 .description {
     margin-top: 12px;
     font-size: 14px;
     line-height: 1.5;
-    color: var(--muted);
+    color: var(--text-muted);
 }
 
 .images {
@@ -337,12 +393,15 @@ video {
 
 .images img {
     width: 100%;
-    border-radius: 12px;
+    border-radius: var(--radius-sm);
     object-fit: cover;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+    box-shadow: 0 6px 20px rgba(0,0,0,.5);
 }
 
-@keyframes fadeIn {
+/* =========================
+   ANIMATION
+========================= */
+@keyframes fade-in {
     from {
         opacity: 0;
         transform: translateY(6px);
@@ -357,90 +416,112 @@ video {
 
 <body>
 
-<div class="app">
-    <div class="card">
-        <div class="header">
-            <div class="logo">TikTok<span>Media</span>Save</div>
-            <div class="subtitle">Загрузка видео и изображений без водяного знака</div>
-        </div>
+<main class="app">
+    <section class="container">
+        <article class="card">
 
-        <div class="input-group">
-            <input id="tiktokUrl" type="text" placeholder="Вставьте ссылку на TikTok">
-            <button id="loadBtn">GO</button>
-        </div>
+            <header class="header">
+                <div class="title">TikTok<span>Media</span>Save</div>
+                <div class="subtitle">
+                    Загрузка видео и изображений без водяного знака
+                </div>
+            </header>
 
-        <div id="status" class="status"></div>
+            <div class="form">
+                <input
+                    id="urlInput"
+                    class="input"
+                    type="text"
+                    placeholder="Вставьте ссылку на TikTok"
+                    autocomplete="off"
+                >
+                <button id="loadBtn" class="button">GO</button>
+            </div>
 
-        <div id="result" class="result hidden">
-            <video id="video" controls playsinline></video>
-            <div id="images" class="images"></div>
-            <div id="description" class="description"></div>
-        </div>
-    </div>
-</div>
+            <div id="status" class="status"></div>
+
+            <section id="result" class="result hidden">
+                <video
+                    id="video"
+                    class="video"
+                    controls
+                    playsinline
+                ></video>
+
+                <div id="images" class="images"></div>
+
+                <div id="description" class="description"></div>
+            </section>
+
+        </article>
+    </section>
+</main>
 
 <script>
-const input = document.getElementById("tiktokUrl");
-const loadBtn = document.getElementById("loadBtn");
-const statusEl = document.getElementById("status");
-const resultEl = document.getElementById("result");
-const videoEl = document.getElementById("video");
-const imagesEl = document.getElementById("images");
-const descEl = document.getElementById("description");
+const input = document.getElementById("urlInput");
+const button = document.getElementById("loadBtn");
+const status = document.getElementById("status");
+const result = document.getElementById("result");
+const video = document.getElementById("video");
+const images = document.getElementById("images");
+const description = document.getElementById("description");
 
-loadBtn.addEventListener("click", loadTikTok);
+button.addEventListener("click", load);
 
-async function loadTikTok() {
+async function load() {
     const url = input.value.trim();
     if (!url) {
         setStatus("Введите ссылку на TikTok", true);
         return;
     }
 
-    resetUI();
+    reset();
     setStatus("Загрузка...");
 
     try {
-        const apiUrl = `https://tikwm.com/api/?url=${encodeURIComponent(url)}`;
-        const res = await fetch(apiUrl);
-        if (!res.ok) throw new Error("Ошибка сети");
-        const json = await res.json();
-        if (json.code !== 0) throw new Error(json.msg || "Ошибка API");
+        const response = await fetch(
+            `https://tikwm.com/api/?url=${encodeURIComponent(url)}`
+        );
+        if (!response.ok) throw new Error("Ошибка сети");
+
+        const json = await response.json();
+        if (json.code !== 0) throw new Error(json.msg);
 
         render(json.data);
         setStatus("Готово");
     } catch (e) {
-        setStatus(e.message, true);
+        setStatus(e.message || "Ошибка", true);
     }
 }
 
 function render(data) {
-    videoEl.src = data.play;
-    descEl.textContent = data.title || "";
+    video.src = data.play;
+    description.textContent = data.title || "";
 
-    imagesEl.innerHTML = "";
+    images.innerHTML = "";
     if (Array.isArray(data.images)) {
         data.images.forEach(src => {
             const img = document.createElement("img");
             img.src = src;
-            imagesEl.appendChild(img);
+            images.appendChild(img);
         });
     }
 
-    resultEl.classList.remove("hidden");
+    result.classList.remove("hidden");
 }
 
-function resetUI() {
-    resultEl.classList.add("hidden");
-    videoEl.src = "";
-    imagesEl.innerHTML = "";
+function reset() {
+    result.classList.add("hidden");
+    video.src = "";
+    images.innerHTML = "";
 }
 
 function setStatus(text, error = false) {
-    statusEl.textContent = text;
-    statusEl.classList.toggle("error", error);
+    status.textContent = text;
+    status.classList.toggle("error", error);
 }
 </script>
 
 </body>
 </html>
+
