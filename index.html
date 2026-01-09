@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!--<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -169,6 +169,283 @@
         statusEl.textContent = text;
         statusEl.style.color = error ? "#ff4d4d" : "#aaaaaa";
     }
+</script>
+
+</body>
+</html>-->
+
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>TikTok Media Viewer</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="referrer" content="no-referrer">
+
+    <meta http-equiv="Content-Security-Policy"
+          content="
+            default-src 'self';
+            img-src https: data:;
+            media-src https:;
+            connect-src https://tikwm.com;
+            style-src 'self' 'unsafe-inline';
+            script-src 'self';
+          ">
+
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --card: rgba(255, 255, 255, 0.04);
+            --border: rgba(255, 255, 255, 0.08);
+            --accent: #e50914;
+            --accent-hover: #ff1f2d;
+            --text: #ffffff;
+            --muted: #9a9a9a;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background:
+                radial-gradient(1200px 600px at 50% -200px, rgba(229,9,20,0.15), transparent),
+                var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+        }
+
+        .app {
+            width: 100%;
+            max-width: 460px;
+            padding: 24px 16px 40px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .header p {
+            margin-top: 6px;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .card {
+            background: var(--card);
+            backdrop-filter: blur(14px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-group input {
+            flex: 1;
+            padding: 12px 14px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            outline: none;
+            font-size: 14px;
+        }
+
+        .input-group input::placeholder {
+            color: #777;
+        }
+
+        .input-group button {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 12px;
+            background: var(--accent);
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background .2s ease;
+        }
+
+        .input-group button:hover {
+            background: var(--accent-hover);
+        }
+
+        .status {
+            margin-top: 12px;
+            font-size: 13px;
+            color: var(--muted);
+            min-height: 18px;
+        }
+
+        .status.error {
+            color: #ff4d4d;
+        }
+
+        .result {
+            margin-top: 18px;
+            display: none;
+            animation: fadeIn .3s ease;
+        }
+
+        video {
+            width: 100%;
+            border-radius: 14px;
+            background: #000;
+        }
+
+        .description {
+            margin-top: 10px;
+            font-size: 13px;
+            line-height: 1.4;
+            color: #ddd;
+            word-break: break-word;
+        }
+
+        .images {
+            margin-top: 12px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .images img {
+            width: 100%;
+            border-radius: 10px;
+            object-fit: cover;
+            background: #000;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <div class="header">
+        <h1>TikTok Media Viewer</h1>
+        <p>Просмотр видео и изображений без водяных знаков</p>
+    </div>
+
+    <div class="card">
+        <div class="input-group">
+            <input
+                id="urlInput"
+                type="url"
+                placeholder="https://www.tiktok.com/..."
+                autocomplete="off">
+            <button id="loadBtn">Загрузить</button>
+        </div>
+        <div id="status" class="status"></div>
+    </div>
+
+    <div id="result" class="result">
+        <video id="video" controls playsinline></video>
+        <div id="description" class="description"></div>
+        <div id="images" class="images"></div>
+    </div>
+</div>
+
+<script>
+(() => {
+    const input = document.getElementById("urlInput");
+    const button = document.getElementById("loadBtn");
+    const status = document.getElementById("status");
+    const result = document.getElementById("result");
+    const video = document.getElementById("video");
+    const description = document.getElementById("description");
+    const images = document.getElementById("images");
+
+    const TIKTOK_REGEX = /^https?:\/\/(www\.)?(tiktok\.com|vm\.tiktok\.com)\//i;
+
+    button.addEventListener("click", load);
+
+    async function load() {
+        const url = input.value.trim();
+
+        if (!TIKTOK_REGEX.test(url)) {
+            setStatus("Введите корректную ссылку TikTok", true);
+            return;
+        }
+
+        reset();
+        setStatus("Загрузка…");
+
+        try {
+            const response = await fetch(
+                "https://tikwm.com/api/?url=" + encodeURIComponent(url),
+                { method: "GET" }
+            );
+
+            if (!response.ok) {
+                throw new Error("Ошибка сети");
+            }
+
+            const json = await response.json();
+
+            if (json.code !== 0 || !json.data) {
+                throw new Error("Некорректный ответ API");
+            }
+
+            render(json.data);
+            setStatus("Готово");
+        } catch (err) {
+            setStatus(err.message, true);
+        }
+    }
+
+    function render(data) {
+        if (data.play) {
+            video.src = data.play;
+        }
+
+        description.textContent = data.title || "";
+
+        images.textContent = "";
+        if (Array.isArray(data.images)) {
+            data.images.forEach(src => {
+                const img = document.createElement("img");
+                img.src = src;
+                img.loading = "lazy";
+                images.appendChild(img);
+            });
+        }
+
+        result.style.display = "block";
+    }
+
+    function reset() {
+        result.style.display = "none";
+        video.removeAttribute("src");
+        description.textContent = "";
+        images.textContent = "";
+    }
+
+    function setStatus(text, error = false) {
+        status.textContent = text;
+        status.classList.toggle("error", error);
+    }
+})();
 </script>
 
 </body>
