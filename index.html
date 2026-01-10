@@ -343,7 +343,9 @@
         tg.requestFullscreen();
     }
 
-    tg.disebleVerticalSwipes();
+    tg.enableClosingConfirmation();
+    tg.disableVerticalSwipes();
+    tg.lockOrientation();
 
 
     function applyLayout() {
