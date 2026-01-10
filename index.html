@@ -400,8 +400,14 @@
 
     tg.ready();
     tg.expand();
+
+    if (tg.isVersionAtLeast("8.0")) {
+        tg.requestFullscreen();
+    }
+
     tg.enableClosingConfirmation();
     tg.disableVerticalSwipes();
+    tg.lockOrientation();
 
     function syncViewport() {
         document.documentElement.style.setProperty(
