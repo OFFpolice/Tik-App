@@ -27,16 +27,6 @@
             color: #ffffff;
         }
 
-        .blocked {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            text-align: center;
-            font-size: 16px;
-            padding: 24px;
-        }
-
         .app {
             width: 100%;
             max-width: 480px;
@@ -137,11 +127,7 @@
 </head>
 <body>
 
-<div id="blocked" class="blocked hidden">
-    Это приложение работает только внутри Telegram.
-</div>
-
-<div id="app" class="app">
+<div class="app">
     <div class="top-bar">
         <div class="title">TikTok-App</div>
         <div class="search-box">
@@ -161,15 +147,6 @@
 </div>
 
 <script>
-    if (
-        !window.Telegram ||
-        !Telegram.WebApp ||
-        !Telegram.WebApp.initData
-    ) {
-        document.getElementById("blocked").classList.remove("hidden");
-        throw new Error("Not Telegram WebApp");
-    }
-
     const tg = Telegram.WebApp;
 
     tg.ready();
@@ -195,8 +172,6 @@
     tg.onEvent("viewportChanged", e => {
         if (e.isStateStable) syncViewport();
     });
-
-    document.getElementById("app").style.display = "flex";
 
     const input = document.getElementById("tiktokUrl");
     const loadBtn = document.getElementById("loadBtn");
