@@ -147,6 +147,16 @@
 </div>
 
 <script>
+
+    if (
+        !window.Telegram ||
+        !Telegram.WebApp ||
+        !Telegram.WebApp.initData
+    ) {
+        document.getElementById("blocked").classList.remove("hidden");
+        throw new Error("Not Telegram WebApp");
+    }
+
     const tg = Telegram.WebApp;
 
     tg.ready();
