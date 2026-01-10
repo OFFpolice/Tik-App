@@ -345,7 +345,9 @@
     tg.setHeaderColor("bg_color");
     tg.setBackgroundColor("bg_color");
     tg.setBottomBarColor("bg_color");
-    tg.enableVerticalSwipes();
+    tg.enableClosingConfirmation();
+    tg.disableVerticalSwipes();
+    tg.lockOrientation();
 
     function applyLayout() {
         const inset = tg.contentSafeAreaInset || { top: 0, bottom: 0 };
