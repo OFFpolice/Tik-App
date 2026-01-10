@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!--<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -167,6 +167,233 @@
         resultEl.classList.add("hidden");
         videoEl.src = "";
         imagesEl.innerHTML = "";
+    }
+
+    function setStatus(text, error = false) {
+        statusEl.textContent = text;
+        statusEl.style.color = error ? "#ff4d4d" : "#aaaaaa";
+    }
+</script>
+
+</body>
+</html>-->
+
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>TikTokMediaSaveBot</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <script src="https://telegram.org/js/telegram-web-app.js?59"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background: #0b0b0b;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+        }
+
+        .app {
+            width: 100%;
+            max-width: 480px;
+            min-height: 100vh;
+            background: #0b0b0b;
+        }
+
+        /* ===== TOP BAR ===== */
+        .top-bar {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: rgba(15, 15, 15, 0.9);
+            backdrop-filter: blur(12px);
+            padding: 14px 16px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .title {
+            font-size: 20px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 14px;
+            border-radius: 12px;
+            border: none;
+            outline: none;
+            background: #1a1a1a;
+            color: #ffffff;
+            font-size: 15px;
+        }
+
+        .search-box input::placeholder {
+            color: #777;
+        }
+
+        .search-box button {
+            padding: 14px 18px;
+            border: none;
+            border-radius: 12px;
+            background: #e50914;
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .search-box button:active {
+            transform: scale(0.97);
+        }
+
+        /* ===== CONTENT ===== */
+        .content {
+            padding: 18px 16px 30px;
+        }
+
+        .status {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #aaaaaa;
+            text-align: center;
+        }
+
+        .result {
+            margin-top: 18px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        video {
+            width: 100%;
+            border-radius: 16px;
+            background: #000;
+        }
+
+        .images {
+            margin-top: 14px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .images img {
+            width: 100%;
+            border-radius: 12px;
+            object-fit: cover;
+            background: #111;
+        }
+
+        .description {
+            margin-top: 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            color: #dddddd;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+
+    <div class="top-bar">
+        <div class="title">TikTok Media</div>
+        <div class="search-box">
+            <input id="tiktokUrl" type="text" placeholder="Ссылка на видео или фото TikTok">
+            <button id="loadBtn">Загрузить</button>
+        </div>
+    </div>
+
+    <div class="content">
+        <div id="status" class="status"></div>
+
+        <div id="result" class="result hidden">
+            <video id="video" controls playsinline></video>
+            <div id="images" class="images"></div>
+            <div id="description" class="description"></div>
+        </div>
+    </div>
+
+</div>
+
+<script src="./static/js/tg.js"></script>
+
+<script>
+    const input = document.getElementById("tiktokUrl");
+    const loadBtn = document.getElementById("loadBtn");
+    const statusEl = document.getElementById("status");
+    const resultEl = document.getElementById("result");
+    const videoEl = document.getElementById("video");
+    const descEl = document.getElementById("description");
+    const imagesEl = document.getElementById("images");
+
+    loadBtn.addEventListener("click", loadTikTok);
+
+    async function loadTikTok() {
+        const url = input.value.trim();
+
+        if (!url) {
+            setStatus("Введите ссылку на TikTok", true);
+            return;
+        }
+
+        resetUI();
+        setStatus("Загрузка...");
+
+        try {
+            const apiUrl = `https://tikwm.com/api/?url=${encodeURIComponent(url)}`;
+            const response = await fetch(apiUrl);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+            const data = await response.json();
+            if (data.code !== 0) throw new Error(data.msg || "Ошибка API");
+
+            renderResult(data.data);
+            setStatus("Готово");
+        } catch (e) {
+            setStatus(`Ошибка: ${e.message}`, true);
+        }
+    }
+
+    function renderResult(data) {
+        videoEl.src = data.play || "";
+        descEl.textContent = data.title || "";
+
+        imagesEl.innerHTML = "";
+        if (Array.isArray(data.images)) {
+            data.images.forEach(src => {
+                const img = document.createElement("img");
+                img.src = src;
+                imagesEl.appendChild(img);
+            });
+        }
+
+        resultEl.classList.remove("hidden");
+    }
+
+    function resetUI() {
+        resultEl.classList.add("hidden");
+        videoEl.src = "";
+        imagesEl.innerHTML = "";
+        descEl.textContent = "";
     }
 
     function setStatus(text, error = false) {
