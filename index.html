@@ -326,8 +326,8 @@
     <div class="content">
         <div id="status" class="status"></div>
         <div id="result" class="result hidden">
-            <video id="video" controls playsinline></video>
             <div id="images" class="images"></div>
+            <video id="video" controls playsinline></video>
             <div id="description" class="description"></div>
         </div>
     </div>
@@ -387,7 +387,7 @@
             if (json.code !== 0) throw new Error();
 
             render(json.data);
-            setStatus("Готово");
+            setStatus("Готово!");
         } catch {
             setStatus("Ошибка загрузки", true);
         }
