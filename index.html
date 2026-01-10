@@ -179,28 +179,24 @@
 </html>-->
 
 
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <title>TikTok Media</title>
-
-    <meta name="viewport"
-          content="width=device-width,
-                   height=device-height,
-                   initial-scale=1.0,
-                   maximum-scale=1.0,
-                   user-scalable=no,
-                   viewport-fit=cover">
-
+    <meta name="viewport" content="width=device-width,height=device-height,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
     <style>
         * {
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Arial, sans-serif;
+        }
+
+        :root {
+            --tg-safe-top: 0px;
+            --tg-safe-bottom: 0px;
+            --tg-viewport-height: 100dvh;
         }
 
         html, body {
@@ -221,25 +217,17 @@
         .app {
             width: 100%;
             max-width: 480px;
-            height: 100dvh;
+            height: var(--tg-viewport-height);
             display: flex;
             flex-direction: column;
             background: #0b0b0b;
         }
 
-        /* ===== FIXED TOP BAR ===== */
         .top-bar {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            padding:
-                calc(env(safe-area-inset-top) + 14px)
-                16px
-                16px;
-
-            background: rgba(15, 15, 15, 0.92);
+            padding: calc(var(--tg-safe-top) + 14px) 16px 16px;
+            background: rgba(15,15,15,.95);
             backdrop-filter: blur(14px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            border-bottom: 1px solid rgba(255,255,255,.08);
         }
 
         .title {
@@ -275,12 +263,10 @@
             font-weight: 500;
         }
 
-        /* ===== SCROLL AREA ===== */
         .content {
             flex: 1;
             overflow-y: auto;
-            padding: 18px 16px calc(env(safe-area-inset-bottom) + 24px);
-            -webkit-overflow-scrolling: touch;
+            padding: 18px 16px calc(var(--tg-safe-bottom) + 24px);
         }
 
         .status {
@@ -329,7 +315,6 @@
 <body>
 
 <div class="app">
-
     <div class="top-bar">
         <div class="title">TikTok Media</div>
         <div class="search-box">
@@ -340,22 +325,40 @@
 
     <div class="content">
         <div id="status" class="status"></div>
-
         <div id="result" class="result hidden">
             <video id="video" controls playsinline></video>
             <div id="images" class="images"></div>
             <div id="description" class="description"></div>
         </div>
     </div>
-
 </div>
 
 <script>
-    const tg = window.Telegram.WebApp;
-    tg.expand();
-    tg.disableVerticalSwipes();
+    const tg = Telegram.WebApp;
 
-    document.body.style.background = tg.themeParams.bg_color || "#0b0b0b";
+    tg.ready();
+
+    if (tg.isVersionAtLeast("8.0")) {
+        tg.requestFullscreen();
+    }
+
+    tg.setHeaderColor("bg_color");
+    tg.setBackgroundColor("bg_color");
+    tg.setBottomBarColor("bg_color");
+    tg.enableVerticalSwipes();
+
+    function applyLayout() {
+        const inset = tg.contentSafeAreaInset || { top: 0, bottom: 0 };
+        document.documentElement.style.setProperty("--tg-safe-top", inset.top + "px");
+        document.documentElement.style.setProperty("--tg-safe-bottom", inset.bottom + "px");
+        document.documentElement.style.setProperty("--tg-viewport-height", tg.viewportStableHeight + "px");
+    }
+
+    applyLayout();
+
+    tg.onEvent("viewportChanged", e => {
+        if (e.isStateStable) applyLayout();
+    });
 
     const input = document.getElementById("tiktokUrl");
     const loadBtn = document.getElementById("loadBtn");
@@ -369,7 +372,10 @@
 
     async function loadTikTok() {
         const url = input.value.trim();
-        if (!url) return setStatus("Введите ссылку", true);
+        if (!url) {
+            setStatus("Введите ссылку", true);
+            return;
+        }
 
         resetUI();
         setStatus("Загрузка...");
@@ -377,7 +383,7 @@
         try {
             const res = await fetch(`https://tikwm.com/api/?url=${encodeURIComponent(url)}`);
             const json = await res.json();
-            if (json.code !== 0) throw new Error("Ошибка API");
+            if (json.code !== 0) throw new Error();
 
             render(json.data);
             setStatus("Готово");
@@ -389,7 +395,6 @@
     function render(data) {
         videoEl.src = data.play || "";
         descEl.textContent = data.title || "";
-
         imagesEl.innerHTML = "";
         if (Array.isArray(data.images)) {
             data.images.forEach(src => {
@@ -398,7 +403,6 @@
                 imagesEl.appendChild(img);
             });
         }
-
         resultEl.classList.remove("hidden");
     }
 
