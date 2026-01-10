@@ -183,138 +183,120 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <title>TikTokMediaSaveBot</title>
-    <meta name="viewport" content="width=device-width,height=device-height,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Arial, sans-serif;
-        }
-
-        :root {
-            --tg-safe-top: 0px;
-            --tg-safe-bottom: 0px;
-            --tg-viewport-height: 100dvh;
-        }
-
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            background: #0b0b0b;
-            overflow: hidden;
-        }
-
-        body {
-            display: flex;
-            justify-content: center;
-            color: #ffffff;
-        }
-
-        .app {
-            width: 100%;
-            max-width: 480px;
-            height: var(--tg-viewport-height);
-            display: flex;
-            flex-direction: column;
-            background: #0b0b0b;
-        }
-
-        .top-bar {
-            padding: calc(var(--tg-safe-top) + 14px) 16px 16px;
-            background: rgba(15,15,15,.95);
-            backdrop-filter: blur(14px);
-            border-bottom: 1px solid rgba(255,255,255,.08);
-        }
-
-        .title {
-            text-align: center;
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 12px;
-        }
-
-        .search-box {
-            display: flex;
-            gap: 10px;
-        }
-
-        .search-box input {
-            flex: 1;
-            padding: 14px;
-            border-radius: 14px;
-            border: none;
-            outline: none;
-            background: #1a1a1a;
-            color: #ffffff;
-            font-size: 15px;
-        }
-
-        .search-box button {
-            padding: 14px 18px;
-            border-radius: 14px;
-            border: none;
-            background: #e50914;
-            color: #ffffff;
-            font-size: 15px;
-            font-weight: 500;
-        }
-
-        .content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 18px 16px calc(var(--tg-safe-bottom) + 24px);
-        }
-
-        .status {
-            text-align: center;
-            font-size: 14px;
-            color: #aaaaaa;
-            margin-top: 10px;
-        }
-
-        .result {
-            margin-top: 18px;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        video {
-            width: 100%;
-            border-radius: 16px;
-            background: #000;
-        }
-
-        .images {
-            margin-top: 14px;
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-        }
-
-        .images img {
-            width: 100%;
-            border-radius: 14px;
-            background: #111;
-            object-fit: cover;
-        }
-
-        .description {
-            margin-top: 14px;
-            font-size: 14px;
-            line-height: 1.45;
-            color: #dddddd;
-        }
-    </style>
+<meta charset="UTF-8">
+<title>TikTokMediaSaveBot</title>
+<meta name="viewport" content="width=device-width,height=device-height,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Arial, sans-serif;
+}
+:root {
+    --tg-safe-top: 0px;
+    --tg-safe-bottom: 0px;
+    --tg-viewport-height: 100dvh;
+}
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background: #0b0b0b;
+    overflow: hidden;
+}
+body {
+    display: flex;
+    justify-content: center;
+    color: #ffffff;
+}
+.app {
+    width: 100%;
+    max-width: 480px;
+    height: var(--tg-viewport-height);
+    display: flex;
+    flex-direction: column;
+    background: #0b0b0b;
+}
+.top-bar {
+    padding: calc(var(--tg-safe-top) + 14px) 16px 16px;
+    background: rgba(15,15,15,.95);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.title {
+    text-align: center;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+.search-box {
+    display: flex;
+    gap: 10px;
+}
+.search-box input {
+    flex: 1;
+    padding: 14px;
+    border-radius: 14px;
+    border: none;
+    outline: none;
+    background: #1a1a1a;
+    color: #ffffff;
+    font-size: 15px;
+}
+.search-box button {
+    padding: 14px 18px;
+    border-radius: 14px;
+    border: none;
+    background: #e50914;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 500;
+}
+.content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 18px 16px calc(var(--tg-safe-bottom) + 24px);
+}
+.status {
+    text-align: center;
+    font-size: 14px;
+    color: #aaaaaa;
+    margin-top: 10px;
+}
+.result {
+    margin-top: 18px;
+}
+.hidden {
+    display: none;
+}
+video {
+    width: 100%;
+    border-radius: 16px;
+    background: #000;
+}
+.images {
+    margin-top: 14px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+.images img {
+    width: 100%;
+    border-radius: 14px;
+    background: #111;
+    object-fit: cover;
+}
+.description {
+    margin-top: 14px;
+    font-size: 14px;
+    line-height: 1.45;
+    color: #dddddd;
+}
+</style>
 </head>
 <body>
-
 <div class="app">
     <div class="top-bar">
         <div class="title">TikTok-App</div>
@@ -323,7 +305,6 @@
             <button id="loadBtn">Загрузить</button>
         </div>
     </div>
-
     <div class="content">
         <div id="status" class="status"></div>
         <div id="result" class="result hidden">
@@ -336,55 +317,46 @@
 
 <script>
 const tg = Telegram.WebApp;
-
 tg.ready();
 tg.expand();
-
-if (tg.isVersionAtLeast("8.0")) {
-    tg.requestFullscreen();
-}
-
+if (tg.isVersionAtLeast("8.0")) tg.requestFullscreen();
 tg.enableClosingConfirmation();
 tg.disableVerticalSwipes();
 tg.lockOrientation();
 
-let lastHeight = null;
+let lastHeight = window.innerHeight;
 let lastInsetTop = 0;
 let lastInsetBottom = 0;
 
-function applyLayout(force = false) {
+function applyLayout() {
     const inset = tg.contentSafeAreaInset || {};
     const height = tg.viewportStableHeight;
-
-    if (!force && (!height || height <= 0)) return;
-
-    lastHeight = height || lastHeight || window.innerHeight;
-    lastInsetTop = inset.top ?? lastInsetTop ?? 0;
-    lastInsetBottom = inset.bottom ?? lastInsetBottom ?? 0;
-
+    if (height && height > 0) lastHeight = height;
+    lastInsetTop = inset.top ?? lastInsetTop;
+    lastInsetBottom = inset.bottom ?? lastInsetBottom;
     document.documentElement.style.setProperty("--tg-safe-top", lastInsetTop + "px");
     document.documentElement.style.setProperty("--tg-safe-bottom", lastInsetBottom + "px");
     document.documentElement.style.setProperty("--tg-viewport-height", lastHeight + "px");
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    applyLayout(true);
-});
+function waitForViewport(retries = 50, interval = 50) {
+    const check = () => {
+        const height = tg.viewportStableHeight;
+        if (height && height > 0) {
+            applyLayout();
+        } else if (retries > 0) {
+            retries--;
+            setTimeout(check, interval);
+        } else {
+            applyLayout();
+        }
+    };
+    check();
+}
 
-tg.onEvent("viewportChanged", e => {
-    if (e.isStateStable) {
-        applyLayout(true);
-    }
-});
-
-window.addEventListener("resize", () => {
-    if (!lastHeight) {
-        document.documentElement.style.setProperty(
-            "--tg-viewport-height",
-            window.innerHeight + "px"
-        );
-    }
-});
+document.addEventListener("DOMContentLoaded", waitForViewport);
+tg.onEvent("viewportChanged", e => { if (e.isStateStable) applyLayout(); });
+window.addEventListener("resize", applyLayout);
 
 const input = document.getElementById("tiktokUrl");
 const loadBtn = document.getElementById("loadBtn");
@@ -398,19 +370,13 @@ loadBtn.onclick = loadTikTok;
 
 async function loadTikTok() {
     const url = input.value.trim();
-    if (!url) {
-        setStatus("Введите ссылку на медиа из TikTok", true);
-        return;
-    }
-
+    if (!url) return setStatus("Введите ссылку на медиа из TikTok", true);
     resetUI();
     setStatus("Загрузка...");
-
     try {
         const res = await fetch(`https://tikwm.com/api/?url=${encodeURIComponent(url)}`);
         const json = await res.json();
         if (json.code !== 0) throw new Error();
-
         render(json.data);
         setStatus("Готово!");
     } catch {
@@ -422,13 +388,7 @@ function render(data) {
     videoEl.src = data.play || "";
     descEl.textContent = data.title || "";
     imagesEl.innerHTML = "";
-    if (Array.isArray(data.images)) {
-        data.images.forEach(src => {
-            const img = document.createElement("img");
-            img.src = src;
-            imagesEl.appendChild(img);
-        });
-    }
+    if (Array.isArray(data.images)) data.images.forEach(src => { const img = document.createElement("img"); img.src = src; imagesEl.appendChild(img); });
     resultEl.classList.remove("hidden");
 }
 
@@ -444,7 +404,6 @@ function setStatus(text, error = false) {
     statusEl.style.color = error ? "#ff4d4d" : "#aaaaaa";
 }
 </script>
-
 </body>
 </html>
 
