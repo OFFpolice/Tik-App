@@ -186,7 +186,7 @@
     async function loadTikTok() {
         const url = input.value.trim();
         if (!url) {
-            setStatus("Введите ссылку на медиа из TikTok", true);
+            setStatus("Введите ссылку на медиа из TikTok!", true);
             return;
         }
 
@@ -200,7 +200,7 @@
             render(json.data);
             setStatus("Готово!");
         } catch {
-            setStatus("Ошибка загрузки", true);
+            setStatus("Ошибка загрузки!", true);
         }
     }
 
@@ -436,7 +436,7 @@
     async function loadTikTok() {
         const url = input.value.trim();
         if (!url) {
-            setStatus("Введите ссылку на TikTok", true);
+            setStatus("Введите ссылку на медиа из TikTok!", true);
             return;
         }
 
@@ -448,9 +448,9 @@
             const json = await res.json();
             if (json.code !== 0) throw new Error();
             render(json.data);
-            setStatus("Готово");
+            setStatus("Готово!");
         } catch {
-            setStatus("Ошибка загрузки", true);
+            setStatus("Ошибка загрузки!", true);
         }
     }
 
