@@ -316,9 +316,9 @@
 
 <div class="app">
     <div class="top-bar">
-        <div class="title">TikTok</div>
+        <div class="title">TikTok-App</div>
         <div class="search-box">
-            <input id="tiktokUrl" placeholder="Вставьте ссылку на медиа из TikTok">
+            <input id="tiktokUrl" placeholder="Введите ссылку...">
             <button id="loadBtn">Загрузить</button>
         </div>
     </div>
@@ -369,7 +369,7 @@
     async function loadTikTok() {
         const url = input.value.trim();
         if (!url) {
-            setStatus("Введите ссылку", true);
+            setStatus("Введите ссылку на медиа из TikTok", true);
             return;
         }
 
