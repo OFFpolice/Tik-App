@@ -338,6 +338,13 @@
 <script>
     const tg = Telegram.WebApp;
 
+    function applyLayout() {
+        const inset = tg.contentSafeAreaInset || { top: 0, bottom: 0 };
+        document.documentElement.style.setProperty("--tg-safe-top", inset.top + "px");
+        document.documentElement.style.setProperty("--tg-safe-bottom", inset.bottom + "px");
+        document.documentElement.style.setProperty("--tg-viewport-height", tg.viewportStableHeight + "px");
+    }
+
     tg.ready();
     tg.expand();
 
@@ -348,15 +355,6 @@
     tg.enableClosingConfirmation();
     tg.disableVerticalSwipes();
     tg.lockOrientation();
-
-
-    function applyLayout() {
-        const inset = tg.contentSafeAreaInset || { top: 0, bottom: 0 };
-        document.documentElement.style.setProperty("--tg-safe-top", inset.top + "px");
-        document.documentElement.style.setProperty("--tg-safe-bottom", inset.bottom + "px");
-        document.documentElement.style.setProperty("--tg-viewport-height", tg.viewportStableHeight + "px");
-    }
-
     applyLayout();
 
     tg.onEvent("viewportChanged", e => {
