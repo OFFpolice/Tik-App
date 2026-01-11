@@ -237,7 +237,287 @@
 
 
 
+
 <!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>TikTokMediaSaveBot</title>
+    <meta name="viewport" content="width=device-width,height=device-height,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <style>
+        :root {
+            --bg: var(--tg-theme-bg-color, #000000);
+            --text: var(--tg-theme-text-color, #ffffff);
+            --hint: var(--tg-theme-hint-color, #aaaaaa);
+            --link: var(--tg-theme-link-color, #4ea4ff);
+
+            --button-bg: var(--tg-theme-button-color, #e50914);
+            --button-text: var(--tg-theme-button-text-color, #ffffff);
+
+            --secondary-bg: var(--tg-theme-secondary-bg-color, #0f0f0f);
+            --header-bg: var(--tg-theme-header-bg-color, #000000);
+            --bottom-bar-bg: var(--tg-theme-bottom-bar-bg-color, #000000);
+
+            --accent: var(--tg-theme-accent-text-color, #ff3b30);
+            --section-bg: var(--tg-theme-section-bg-color, #0a0a0a);
+            --section-header: var(--tg-theme-section-header-text-color, #ffffff);
+            --separator: var(--tg-theme-section-separator-color, rgba(255,255,255,.08));
+            --subtitle: var(--tg-theme-subtitle-text-color, #bbbbbb);
+            --destructive: var(--tg-theme-destructive-text-color, #ff4d4d);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Arial, sans-serif;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg);
+            color: var(--text);
+            overflow: hidden;
+        }
+
+        .blocked {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            font-size: 16px;
+            padding: 24px;
+            color: var(--hint);
+        }
+
+        .app {
+            width: 100%;
+            max-width: 480px;
+            height: var(--tg-viewport-height, 100dvh);
+            display: none;
+            flex-direction: column;
+            background: var(--bg);
+            margin: 0 auto;
+        }
+
+        .top-bar {
+            padding: calc(var(--tg-safe-area-inset-top) + 14px) 16px 16px;
+            background: var(--header-bg);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--separator);
+        }
+
+        .title {
+            text-align: center;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--section-header);
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 14px;
+            border-radius: 14px;
+            border: none;
+            outline: none;
+            background: var(--secondary-bg);
+            color: var(--text);
+            font-size: 15px;
+        }
+
+        .search-box input::placeholder {
+            color: var(--hint);
+        }
+
+        .search-box button {
+            padding: 14px 18px;
+            border-radius: 14px;
+            border: none;
+            background: var(--button-bg);
+            color: var(--button-text);
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 18px 16px calc(var(--tg-content-safe-area-inset-bottom) + 24px);
+        }
+
+        .status {
+            text-align: center;
+            font-size: 14px;
+            color: var(--hint);
+            margin-top: 10px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        video {
+            width: 100%;
+            border-radius: 16px;
+            background: #000;
+        }
+
+        .images {
+            margin-top: 14px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .images img {
+            width: 100%;
+            border-radius: 14px;
+            background: var(--section-bg);
+            object-fit: cover;
+        }
+
+        .description {
+            margin-top: 14px;
+            font-size: 14px;
+            line-height: 1.45;
+            color: var(--subtitle);
+        }
+    </style>
+</head>
+<body>
+
+<div id="blocked" class="blocked">
+    Это приложение работает только внутри Telegram.
+</div>
+
+<div id="app" class="app">
+    <div class="top-bar">
+        <div class="title">TikTok-App</div>
+        <div class="search-box">
+            <input id="tiktokUrl" placeholder="Введите ссылку...">
+            <button id="loadBtn">Загрузить</button>
+        </div>
+    </div>
+
+    <div class="content">
+        <div id="status" class="status"></div>
+        <div id="images" class="images"></div>
+        <video id="video" controls playsinline class="hidden"></video>
+        <div id="description" class="description"></div>
+    </div>
+</div>
+
+<script>
+    if (!window.Telegram || !Telegram.WebApp || !Telegram.WebApp.initData) {
+        document.getElementById("blocked").style.display = "flex";
+        throw new Error("Not Telegram WebApp");
+    }
+
+    const tg = Telegram.WebApp;
+
+    tg.ready();
+    tg.expand();
+
+    if (tg.isVersionAtLeast("8.0")) {
+        tg.requestFullscreen();
+    }
+
+    tg.enableClosingConfirmation();
+    tg.disableVerticalSwipes();
+    tg.lockOrientation();
+
+    function syncViewport() {
+        document.documentElement.style.setProperty(
+            "--tg-viewport-height",
+            tg.viewportStableHeight + "px"
+        );
+    }
+
+    syncViewport();
+    tg.onEvent("viewportChanged", e => e.isStateStable && syncViewport());
+
+    document.getElementById("app").style.display = "flex";
+
+    const input = document.getElementById("tiktokUrl");
+    const loadBtn = document.getElementById("loadBtn");
+    const statusEl = document.getElementById("status");
+    const videoEl = document.getElementById("video");
+    const imagesEl = document.getElementById("images");
+    const descEl = document.getElementById("description");
+
+    loadBtn.onclick = loadTikTok;
+
+    async function loadTikTok() {
+        const url = input.value.trim();
+        if (!url) {
+            setStatus("Введите ссылку на медиа из TikTok!", true);
+            return;
+        }
+
+        resetUI();
+        setStatus("Загрузка...");
+
+        try {
+            const res = await fetch(`https://tikwm.com/api/?url=${encodeURIComponent(url)}`);
+            const json = await res.json();
+            if (json.code !== 0) throw new Error();
+            render(json.data);
+            setStatus("Готово!");
+        } catch {
+            setStatus("Ошибка загрузки!", true);
+        }
+    }
+
+    function render(data) {
+        if (data.play) {
+            videoEl.src = data.play;
+            videoEl.classList.remove("hidden");
+        }
+
+        descEl.textContent = data.title || "";
+        imagesEl.innerHTML = "";
+
+        if (Array.isArray(data.images)) {
+            data.images.forEach(src => {
+                const img = document.createElement("img");
+                img.src = src;
+                imagesEl.appendChild(img);
+            });
+        }
+    }
+
+    function resetUI() {
+        videoEl.classList.add("hidden");
+        videoEl.src = "";
+        imagesEl.innerHTML = "";
+        descEl.textContent = "";
+    }
+
+    function setStatus(text, error = false) {
+        statusEl.textContent = text;
+        statusEl.style.color = error ? "var(--destructive)" : "var(--hint)";
+    }
+</script>
+
+</body>
+</html>
+
+
+
+
+
+<!--<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -484,4 +764,4 @@
 </script>
 
 </body>
-</html>
+</html>-->
