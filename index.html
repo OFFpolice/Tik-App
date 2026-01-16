@@ -170,7 +170,7 @@
     let lang = "en";
 
     async function loadI18n() {
-        const res = await fetch("./i18n.json");
+        const res = await fetch("./Tik-App/i18n.json");
         i18n = await res.json();
         lang = i18n[userLang] ? userLang : "en";
         applyI18n();
