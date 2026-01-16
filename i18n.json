@@ -1,1 +1,22 @@
-i18n.json
+{
+  "ru": {
+    "blocked": "Это приложение работает только внутри Telegram.",
+    "title": "TikTok-App",
+    "placeholder": "Введите ссылку...",
+    "load": "Загрузить",
+    "empty_url": "Введите ссылку на медиа из TikTok!",
+    "loading": "Загрузка...",
+    "done": "Готово!",
+    "error": "Ошибка загрузки!"
+  },
+  "en": {
+    "blocked": "This app works only inside Telegram.",
+    "title": "TikTok App",
+    "placeholder": "Paste link...",
+    "load": "Download",
+    "empty_url": "Please enter a TikTok media link!",
+    "loading": "Loading...",
+    "done": "Done!",
+    "error": "Loading error!"
+  }
+}
