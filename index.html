@@ -10,6 +10,261 @@
     <meta property="og:image:height" content="630">
     <meta property="og:url" content="https://offpolice.github.io/Tik-App/">
     <meta property="og:type" content="website">
+    <title>TikTokMediaSaveBot</title>
+    <meta name="viewport" content="width=device-width,height=device-height,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+    <link rel="icon" href="./static/icon/tiktok.ico" type="image/x-icon">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Arial, sans-serif;
+        }
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background: #000000;
+            overflow: hidden;
+            color: #fff;
+        }
+        .blocked {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            font-size: 16px;
+            padding: 24px;
+        }
+        .app {
+            width: 100%;
+            max-width: 480px;
+            height: var(--tg-viewport-height, 100dvh);
+            display: none;
+            flex-direction: column;
+            background: #000000;
+            margin: 0 auto;
+        }
+        .top-bar {
+            padding: calc(var(--tg-safe-area-inset-top) + 14px) 16px 16px;
+            background: #000000;
+            border-bottom: 1px solid rgba(255,255,255,.08);
+        }
+        .title {
+            text-align: center;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        .search-box {
+            display: flex;
+            gap: 10px;
+        }
+        .search-box input {
+            flex: 1;
+            padding: 14px;
+            border-radius: 14px;
+            border: none;
+            outline: none;
+            background: #1a1a1a;
+            color: #ffffff;
+            font-size: 15px;
+        }
+        .search-box button {
+            padding: 14px 18px;
+            border-radius: 14px;
+            border: none;
+            background: #e50914;
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 500;
+        }
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 18px 16px calc(var(--tg-content-safe-area-inset-bottom) + 24px);
+        }
+        .status {
+            text-align: center;
+            font-size: 14px;
+            color: #aaaaaa;
+            margin-top: 10px;
+        }
+        .hidden {
+            display: none;
+        }
+        video {
+            width: 100%;
+            border-radius: 16px;
+            background: #000;
+        }
+        .images {
+            margin-top: 14px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .images img {
+            width: 100%;
+            border-radius: 14px;
+            background: #111;
+            object-fit: cover;
+        }
+        .description {
+            margin-top: 14px;
+            font-size: 14px;
+            line-height: 1.45;
+            color: #dddddd;
+        }
+    </style>
+</head>
+<body>
+
+<div id="blocked" class="blocked"></div>
+
+<div id="app" class="app">
+    <div class="top-bar">
+        <div id="title" class="title"></div>
+        <div class="search-box">
+            <input id="tiktokUrl">
+            <button id="loadBtn"></button>
+        </div>
+    </div>
+    <div class="content">
+        <div id="status" class="status"></div>
+        <div id="images" class="images"></div>
+        <video id="video" controls playsinline class="hidden"></video>
+        <div id="description" class="description"></div>
+    </div>
+</div>
+
+<script>
+    if (!window.Telegram || !Telegram.WebApp || !Telegram.WebApp.initData) {
+        document.getElementById("blocked").style.display = "flex";
+        throw new Error();
+    }
+
+    const tg = Telegram.WebApp;
+    tg.ready();
+    tg.expand();
+    if (tg.isVersionAtLeast("8.0")) {
+        tg.requestFullscreen();
+    }
+    tg.enableClosingConfirmation();
+    tg.disableVerticalSwipes();
+    tg.lockOrientation();
+
+    function syncViewport() {
+        document.documentElement.style.setProperty("--tg-viewport-height", tg.viewportStableHeight + "px");
+    }
+
+    syncViewport();
+    tg.onEvent("viewportChanged", e => {
+        if (e.isStateStable) syncViewport();
+    });
+
+    const userLang = tg.initDataUnsafe?.user?.language_code?.slice(0, 2) || "en";
+    let i18n = {};
+    let lang = "en";
+
+    async function loadI18n() {
+        const res = await fetch("./i18n.json");
+        i18n = await res.json();
+        lang = i18n[userLang] ? userLang : "en";
+        applyI18n();
+    }
+
+    function t(key) {
+        return i18n[lang][key] || key;
+    }
+
+    function applyI18n() {
+        document.documentElement.lang = lang;
+        document.getElementById("blocked").textContent = t("blocked");
+        document.getElementById("title").textContent = t("title");
+        document.getElementById("tiktokUrl").placeholder = t("placeholder");
+        document.getElementById("loadBtn").textContent = t("load");
+    }
+
+    loadI18n();
+    document.getElementById("app").style.display = "flex";
+
+    const input = document.getElementById("tiktokUrl");
+    const loadBtn = document.getElementById("loadBtn");
+    const statusEl = document.getElementById("status");
+    const videoEl = document.getElementById("video");
+    const imagesEl = document.getElementById("images");
+    const descEl = document.getElementById("description");
+
+    loadBtn.onclick = loadTikTok;
+
+    async function loadTikTok() {
+        const url = input.value.trim();
+        if (!url) {
+            setStatus(t("empty_url"), true);
+            return;
+        }
+        resetUI();
+        setStatus(t("loading"));
+        try {
+            const res = await fetch(`https://tikwm.com/api/?url=${encodeURIComponent(url)}`);
+            const json = await res.json();
+            if (json.code !== 0) throw new Error();
+            render(json.data);
+            setStatus(t("done"));
+        } catch {
+            setStatus(t("error"), true);
+        }
+    }
+
+    function render(data) {
+        if (data.play) {
+            videoEl.src = data.play;
+            videoEl.classList.remove("hidden");
+        }
+        descEl.textContent = data.title || "";
+        imagesEl.innerHTML = "";
+        if (Array.isArray(data.images)) {
+            data.images.forEach(src => {
+                const img = document.createElement("img");
+                img.src = src;
+                imagesEl.appendChild(img);
+            });
+        }
+    }
+
+    function resetUI() {
+        videoEl.classList.add("hidden");
+        videoEl.src = "";
+        imagesEl.innerHTML = "";
+        descEl.textContent = "";
+    }
+
+    function setStatus(text, error = false) {
+        statusEl.textContent = text;
+        statusEl.style.color = error ? "#ff4d4d" : "#aaaaaa";
+    }
+</script>
+
+</body>
+</html>
+
+
+
+<!--<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="TikTok Down Mini App.">
+    <meta property="og:title" content="TikTok Down Mini App.">
+    <meta property="og:description" content="TikTok Down Mini App.">
+    <meta property="og:image" content="https://raw.githubusercontent.com/OFFpolice/Tik-App/refs/heads/main/static/photo/TikTok.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:url" content="https://offpolice.github.io/Tik-App/">
+    <meta property="og:type" content="website">
 
     <title>TikTokMediaSaveBot</title>
     <meta name="viewport" content="width=device-width,height=device-height,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
@@ -255,4 +510,4 @@
 </script>
 
 </body>
-</html>
+</html>-->
