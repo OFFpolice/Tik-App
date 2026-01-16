@@ -227,7 +227,7 @@
 </div>
 
 <script>
-    if (!window.Telegram || !Telegram.WebApp || !Telegram.WebApp) {
+    if (!window.Telegram || !Telegram.WebApp || !Telegram.WebApp.initData) {
         document.getElementById("blocked").style.display = "flex";
         throw new Error("Not Telegram WebApp");
     }
