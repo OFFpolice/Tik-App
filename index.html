@@ -207,21 +207,21 @@
     async function loadTikTok() {
         const url = input.value.trim();
         if (!url) {
-            setStatus("Введите ссылку на медиа из TikTok!", true);
+            setStatus("Enter TikTok media URL!", true);
             return;
         }
 
         resetUI();
-        setStatus("Загрузка...");
+        setStatus("Loading...");
 
         try {
             const res = await fetch(`https://tikwm.com/api/?url=${encodeURIComponent(url)}`);
             const json = await res.json();
             if (json.code !== 0) throw new Error();
             render(json.data);
-            setStatus("Готово!");
+            setStatus("Ready!");
         } catch {
-            setStatus("Ошибка загрузки!", true);
+            setStatus("Loading error!", true);
         }
     }
 
