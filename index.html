@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!--<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -303,6 +303,151 @@
         statusEl.textContent = text;
         statusEl.style.color = error ? "#ff4d4d" : "#aaaaaa";
     }
+</script>
+
+</body>
+</html>-->
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="description" content="TikTokMediaSaveBot.">
+<meta property="og:title" content="TikTokMediaSaveBot.">
+<meta property="og:description" content="TikTok Media Save — is a Telegram mini-app that lets you download videos and photos from TikTok without watermarks.">
+<meta property="og:image" content="https://raw.githubusercontent.com/OFFpolice/Tik-App/refs/heads/main/static/photo/TikTok.png">
+<meta property="og:url" content="https://offpolice.github.io/Tik-App/">
+<meta property="og:type" content="website">
+<title>TikTokMediaSaveBot</title>
+
+<meta name="viewport" content="width=device-width,height=device-height,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<link rel="icon" href="./static/icon/tiktok.ico">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<style>
+*{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Arial}
+html,body{margin:0;height:100%;background:#000;color:#fff}
+.blocked{display:none;align-items:center;justify-content:center;height:100vh}
+.blocked-card{text-align:center;max-width:420px}
+.blocked-link{display:inline-block;padding:14px 22px;border-radius:14px;background:#e50914;color:#fff;text-decoration:none}
+.app{display:none;flex-direction:column;max-width:480px;margin:0 auto;height:100%}
+.top-bar{padding:16px;border-bottom:1px solid rgba(255,255,255,.1)}
+.search-box{display:flex;gap:10px}
+input{flex:1;padding:14px;border-radius:14px;border:none;background:#1a1a1a;color:#fff}
+button{padding:14px 18px;border:none;border-radius:14px;background:#e50914;color:#fff}
+.content{flex:1;overflow-y:auto;padding:16px}
+.status{text-align:center;color:#aaa;margin-bottom:10px}
+video{width:100%;border-radius:16px;margin-bottom:10px}
+.download-btn{width:100%;margin-bottom:16px}
+.images{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.img-card{position:relative}
+.img-card button{position:absolute;bottom:6px;left:6px;right:6px;padding:8px;font-size:13px}
+img{width:100%;border-radius:14px}
+.hidden{display:none}
+</style>
+</head>
+
+<body>
+
+<div id="blocked" class="blocked">
+<div class="blocked-card">
+<h2>TikTok Media Save</h2>
+<p>Works only inside Telegram</p>
+<a class="blocked-link" href="https://t.me/TikTokMediaSaveBot/app">Open in Telegram</a>
+</div>
+</div>
+
+<div id="app" class="app">
+<div class="top-bar">
+<div class="search-box">
+<input id="url" placeholder="Enter TikTok URL">
+<button id="load">Load</button>
+</div>
+</div>
+
+<div class="content">
+<div id="status" class="status"></div>
+<video id="video" controls playsinline class="hidden"></video>
+<button id="downloadVideo" class="download-btn hidden">Download video</button>
+<div id="images" class="images"></div>
+</div>
+</div>
+
+<script>
+if(!window.Telegram||!Telegram.WebApp){document.getElementById("blocked").style.display="flex";throw""}
+const tg=Telegram.WebApp
+tg.ready();tg.expand()
+
+document.getElementById("app").style.display="flex"
+
+const urlInput=document.getElementById("url")
+const loadBtn=document.getElementById("load")
+const statusEl=document.getElementById("status")
+const videoEl=document.getElementById("video")
+const imagesEl=document.getElementById("images")
+const downloadVideoBtn=document.getElementById("downloadVideo")
+
+loadBtn.onclick=load
+
+async function load(){
+const url=urlInput.value.trim()
+if(!url)return status("Enter URL",1)
+reset()
+status("Loading...")
+try{
+const r=await fetch("https://tikwm.com/api/?url="+encodeURIComponent(url))
+const j=await r.json()
+if(j.code!==0)throw""
+render(j.data)
+status("Ready")
+}catch{status("Error",1)}
+}
+
+function render(d){
+if(d.play){
+videoEl.src=d.play
+videoEl.classList.remove("hidden")
+downloadVideoBtn.classList.remove("hidden")
+downloadVideoBtn.onclick=()=>download(d.play,"video.mp4","video/mp4")
+}
+if(Array.isArray(d.images)){
+d.images.forEach((src,i)=>{
+const card=document.createElement("div")
+card.className="img-card"
+const img=document.createElement("img")
+img.src=src
+const btn=document.createElement("button")
+btn.textContent="Download"
+btn.onclick=()=>download(src,`image_${i+1}.jpg`,"image/jpeg")
+card.append(img,btn)
+imagesEl.append(card)
+})
+}
+}
+
+function download(url,name,type){
+tg.downloadFile({
+url,
+file_name:name,
+mime_type:type
+})
+}
+
+function reset(){
+videoEl.classList.add("hidden")
+downloadVideoBtn.classList.add("hidden")
+videoEl.src=""
+imagesEl.innerHTML=""
+}
+
+function status(t,e=0){
+statusEl.textContent=t
+statusEl.style.color=e?"#ff4d4d":"#aaa"
+}
 </script>
 
 </body>
