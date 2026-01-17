@@ -209,7 +209,6 @@
         <div id="images" class="images"></div>
         <video id="video" controls playsinline class="hidden"></video>
         <div id="description" class="description"></div>
-        <button id="downloadVideo" class="download-main hidden">Download</button>
     </div>
 </div>
 
@@ -253,7 +252,6 @@
     const videoEl = document.getElementById("video");
     const imagesEl = document.getElementById("images");
     const descEl = document.getElementById("description");
-    const downloadVideoBtn=document.getElementById("downloadVideo")
 
     loadBtn.onclick = loadTikTok;
 
@@ -292,14 +290,6 @@
                 imagesEl.appendChild(img);
             });
         }
-    }
-
-    function downloadFile(url, name, type) {
-        Telegram.WebApp.downloadFile({
-            url: url,
-            file_name: name,
-            mime_type: type
-        });
     }
 
     function resetUI() {
