@@ -33,7 +33,7 @@
             color: #fff;
         }
 
-        /*.blocked {
+        .blocked {
             display: none;
             align-items: center;
             justify-content: center;
@@ -41,52 +41,6 @@
             text-align: center;
             font-size: 16px;
             padding: 24px;
-        }*/
-
-        .blocked {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          min-height: 100vh;
-          padding: 24px;
-          background: #000;
-        }
-
-        .blockeds-card {
-          width: 100%;
-          max-width: 420px;
-          text-align: center;
-        }
-
-        .blockeds-title {
-          font-size: 22px;
-          font-weight: 600;
-          margin-bottom: 16px;
-        }
-
-        .blockeds-text {
-          font-size: 15px;
-          line-height: 1.55;
-          color: #d0d0d0;
-          margin-bottom: 24px;
-        }
-
-        .blockeds-link {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          padding: 14px 22px;
-          border-radius: 14px;
-          background: #e50914;
-          color: #fff;
-          text-decoration: none;
-          font-size: 15px;
-          font-weight: 500;
-          transition: opacity .2s ease;
-        }
-
-        .blockeds-link:active {
-          opacity: .85;
         }
 
         .app {
@@ -186,27 +140,8 @@
 </head>
 <body>
 
-<!--<div id="blocked" class="blocked">
-    This app runs only in Telegram.
-</div>-->
-
 <div id="blocked" class="blocked">
-    <div class="blockeds-card">
-        <div class="blocked-title">TikTok Media Save</div>
-
-        <div class="blockeds-text">
-            Telegram Mini App для скачивания видео и фото из TikTok без водяных знаков.
-            <br><br>
-            Приложение работает <strong>только внутри Telegram</strong>.
-        </div>
-
-        <a class="blockeds-link"
-           href="https://t.me/TikTokMediaSaveBot/app"
-           target="_blank"
-           rel="noopener noreferrer">
-            Открыть в Telegram
-        </a>
-    </div>
+    This app runs only in Telegram.
 </div>
 
 <div id="app" class="app">
