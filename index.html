@@ -293,6 +293,14 @@
         }
     }
 
+    function downloadFile(url, name, type) {
+        Telegram.WebApp.downloadFile({
+            url: url,
+            file_name: name,
+            mime_type: type
+        });
+    }
+
     function resetUI() {
         videoEl.classList.add("hidden");
         videoEl.src = "";
