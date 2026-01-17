@@ -310,156 +310,427 @@
 
 
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="description" content="TikTokMediaSaveBot.">
-<meta property="og:title" content="TikTokMediaSaveBot.">
-<meta property="og:description" content="TikTok Media Save — is a Telegram mini-app that lets you download videos and photos from TikTok without watermarks. This app runs only in Telegram! Open: https://t.me/TikTokMediaSaveBot/app">
-<meta property="og:image" content="https://raw.githubusercontent.com/OFFpolice/Tik-App/refs/heads/main/static/photo/TikTok.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:url" content="https://offpolice.github.io/Tik-App/">
-<meta property="og:type" content="website">
-<title>TikTokMediaSaveBot</title>
-<meta name="viewport" content="width=device-width,height=device-height,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
-<link rel="icon" href="./static/icon/tiktok.ico" type="image/x-icon">
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-<style>
-* {box-sizing:border-box;-webkit-tap-highlight-color:transparent;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Arial,sans-serif;}
-html,body{margin:0;padding:0;width:100%;height:100%;background:#000;overflow:hidden;color:#fff;}
-.blocked{display:none;align-items:center;justify-content:center;min-height:100vh;padding:24px;background:#000;}
-.blocked-card{width:100%;max-width:420px;text-align:center;}
-.blocked-title{font-size:22px;font-weight:600;margin-bottom:16px;}
-.blocked-text{font-size:15px;line-height:1.55;color:#d0d0d0;margin-bottom:24px;}
-.blocked-link{display:inline-flex;align-items:center;justify-content:center;padding:14px 22px;border-radius:14px;background:#e50914;color:#fff;text-decoration:none;font-size:15px;font-weight:500;transition:opacity .2s ease;}
-.blocked-link:active{opacity:.85;}
-.app{width:100%;max-width:480px;height:var(--tg-viewport-height,100dvh);display:none;flex-direction:column;background:#000;margin:0 auto;}
-.top-bar{padding:calc(var(--tg-safe-area-inset-top) + 14px) 16px 16px;background:#000;backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.08);}
-.title{text-align:center;font-size:20px;font-weight:600;margin-bottom:12px;}
-.search-box{display:flex;gap:10px;}
-.search-box input{flex:1;padding:14px;border-radius:14px;border:none;outline:none;background:#1a1a1a;color:#fff;font-size:15px;}
-.search-box button{padding:14px 18px;border-radius:14px;border:none;background:#e50914;color:#fff;font-size:15px;font-weight:500;}
-.content{flex:1;overflow-y:auto;padding:18px 16px calc(var(--tg-content-safe-area-inset-bottom) + 24px);}
-.status{text-align:center;font-size:14px;color:#aaaaaa;margin-top:10px;}
-.hidden{display:none;}
-video{width:100%;border-radius:16px;background:#000;margin-top:14px;}
-.images{margin-top:14px;display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
-.images img{width:100%;border-radius:14px;background:#111;object-fit:cover;}
-.description{margin-top:14px;font-size:14px;line-height:1.45;color:#dddddd;}
-.download-btn{display:inline-block;margin-top:6px;padding:6px 12px;background:#e50914;color:#fff;border-radius:12px;font-size:13px;font-weight:500;text-align:center;cursor:pointer;}
-.download-btn:active{opacity:.85;}
-</style>
-</head>
-<body>
 
-<div id="blocked" class="blocked">
-<div class="blocked-card">
-<div class="blocked-title">TikTok Media Save</div>
-<div class="blocked-text">Telegram Mini App for downloading videos and photos from TikTok without watermarks.<br><br>The app works <strong>only within Telegram</strong>.</div>
-<a class="blocked-link" href="https://t.me/TikTokMediaSaveBot/app" target="_blank" rel="noopener noreferrer">Open in Telegram</a>
-</div>
-</div>
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="description" content="TikTokMediaSaveBot.">  
+    <meta property="og:title" content="TikTokMediaSaveBot.">  
+    <meta property="og:description" content="TikTok Media Save — is a Telegram mini-app that lets you download videos and photos from TikTok without watermarks. This app runs only in Telegram! Open: https://t.me/TikTokMediaSaveBot/app">  
+    <meta property="og:image" content="https://raw.githubusercontent.com/OFFpolice/Tik-App/refs/heads/main/static/photo/TikTok.png">  
+    <meta property="og:image:width" content="1200">  
+    <meta property="og:image:height" content="630">  
+    <meta property="og:url" content="https://offpolice.github.io/Tik-App/">  
+    <meta property="og:type" content="website">  
+    <title>TikTokMediaSaveBot</title>  
+    <meta name="viewport" content="width=device-width,height=device-height,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">  
+    <link rel="icon" href="./static/icon/tiktok.ico" type="image/x-icon">  
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>  
 
-<div id="app" class="app">
-<div class="top-bar">
-<div class="title">TikTok-App</div>
-<div class="search-box">
-<input id="tiktokUrl" placeholder="Enter URL...">
-<button id="loadBtn">Load</button>
-</div>
-</div>
-<div class="content">
-<div id="status" class="status"></div>
-<div id="images" class="images"></div>
-<video id="video" controls playsinline class="hidden"></video>
-<div id="videoDownload" class="download-btn hidden">Download Video</div>
-<div id="description" class="description"></div>
-</div>
-</div>
+    <style>  
+        * {  
+            box-sizing: border-box;  
+            -webkit-tap-highlight-color: transparent;  
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Arial, sans-serif;  
+        }  
 
-<script>
-if(!window.Telegram||!Telegram.WebApp||!Telegram.WebApp.initData){
-    document.getElementById("blocked").style.display="flex";
-    throw new Error("Not Telegram WebApp");
-}
-const tg=Telegram.WebApp;
-tg.ready();tg.expand();if(tg.isVersionAtLeast("8.0"))tg.requestFullscreen();
-tg.enableClosingConfirmation();tg.disableVerticalSwipes();tg.lockOrientation();
-function syncViewport(){document.documentElement.style.setProperty("--tg-viewport-height",tg.viewportStableHeight+"px");}
-syncViewport();
-tg.onEvent("viewportChanged",e=>{if(e.isStateStable)syncViewport();});
-document.getElementById("app").style.display="flex";
+        html, body {  
+            margin: 0;  
+            padding: 0;  
+            width: 100%;  
+            height: 100%;  
+            background: #000000;  
+            overflow: hidden;  
+            color: #fff;  
+        }  
 
-const input=document.getElementById("tiktokUrl");
-const loadBtn=document.getElementById("loadBtn");
-const statusEl=document.getElementById("status");
-const videoEl=document.getElementById("video");
-const videoDownload=document.getElementById("videoDownload");
-const imagesEl=document.getElementById("images");
-const descEl=document.getElementById("description");
+        .blocked {  
+            display: none;  
+            align-items: center;  
+            justify-content: center;  
+            min-height: 100vh;  
+            padding: 24px;  
+            background: #000;  
+        }  
 
-loadBtn.onclick=loadTikTok;
+        .blocked-card {  
+            width: 100%;  
+            max-width: 420px;  
+            text-align: center;  
+        }  
 
-async function loadTikTok(){
-    const url=input.value.trim();
-    if(!url){setStatus("Enter TikTok media URL!",true);return;}
-    resetUI();setStatus("Loading...");
-    try{
-        const res=await fetch(`https://tikwm.com/api/?url=${encodeURIComponent(url)}`);
-        const json=await res.json();
-        if(json.code!==0)throw new Error();
-        render(json.data);
-        setStatus("Ready!");
-    }catch{
-        setStatus("Loading error!",true);
-    }
-}
+        .blocked-title {  
+            font-size: 22px;  
+            font-weight: 600;  
+            margin-bottom: 16px;  
+        }  
 
-function render(data){
-    if(data.play){
-        videoEl.src=data.play;
-        videoEl.classList.remove("hidden");
-        if(tg.isVersionAtLeast("8.0")){
-            videoDownload.classList.remove("hidden");
-            videoDownload.onclick=()=>tg.downloadFile({url:data.play, fileName:"video.mp4"},accepted=>{
-                if(accepted)setStatus("Download started!");
-            });
-        }
-    }
-    descEl.textContent=data.title||"";
-    imagesEl.innerHTML="";
-    if(Array.isArray(data.images)){
-        data.images.forEach((src,i)=>{
-            const wrapper=document.createElement("div");
-            const img=document.createElement("img");
-            img.src=src;
-            wrapper.appendChild(img);
-            if(tg.isVersionAtLeast("8.0")){
-                const btn=document.createElement("div");
-                btn.textContent="Download";
-                btn.className="download-btn";
-                btn.onclick=()=>tg.downloadFile({url:src, fileName:`image_${i+1}.jpg`},accepted=>{
-                    if(accepted)setStatus(`Image ${i+1} download started!`);
-                });
-                wrapper.appendChild(btn);
-            }
-            imagesEl.appendChild(wrapper);
-        });
-    }
-}
+        .blocked-text {  
+            font-size: 15px;  
+            line-height: 1.55;  
+            color: #d0d0d0;  
+            margin-bottom: 24px;  
+        }  
 
-function resetUI(){
-    videoEl.classList.add("hidden");videoEl.src="";
-    videoDownload.classList.add("hidden");
-    imagesEl.innerHTML="";
-    descEl.textContent="";
-}
+        .blocked-link {  
+            display: inline-flex;  
+            align-items: center;  
+            justify-content: center;  
+            padding: 14px 22px;  
+            border-radius: 14px;  
+            background: #e50914;  
+            color: #fff;  
+            text-decoration: none;  
+            font-size: 15px;  
+            font-weight: 500;  
+            transition: opacity .2s ease;  
+        }  
 
-function setStatus(text,error=false){statusEl.textContent=text;statusEl.style.color=error?"#ff4d4d":"#aaaaaa";}
-</script>
+        .blocked-link:active {  
+            opacity: .85;  
+        }  
 
-</body>
+        .app {  
+            width: 100%;  
+            max-width: 480px;  
+            height: var(--tg-viewport-height, 100dvh);  
+            display: none;  
+            flex-direction: column;  
+            background: #000000;  
+            margin: 0 auto;  
+        }  
+
+        .top-bar {  
+            padding: calc(var(--tg-safe-area-inset-top) + 14px) 16px 16px;  
+            background: #000000;  
+            backdrop-filter: blur(14px);  
+            border-bottom: 1px solid rgba(255,255,255,.08);  
+        }  
+
+        .title {  
+            text-align: center;  
+            font-size: 20px;  
+            font-weight: 600;  
+            margin-bottom: 12px;  
+        }  
+
+        .search-box {  
+            display: flex;  
+            gap: 10px;  
+        }  
+
+        .search-box input {  
+            flex: 1;  
+            padding: 14px;  
+            border-radius: 14px;  
+            border: none;  
+            outline: none;  
+            background: #1a1a1a;  
+            color: #ffffff;  
+            font-size: 15px;  
+        }  
+
+        .search-box button {  
+            padding: 14px 18px;  
+            border-radius: 14px;  
+            border: none;  
+            background: #e50914;  
+            color: #ffffff;  
+            font-size: 15px;  
+            font-weight: 500;  
+        }  
+
+        .content {  
+            flex: 1;  
+            overflow-y: auto;  
+            padding: 18px 16px calc(var(--tg-content-safe-area-inset-bottom) + 24px);  
+        }  
+
+        .status {  
+            text-align: center;  
+            font-size: 14px;  
+            color: #aaaaaa;  
+            margin-top: 10px;  
+        }  
+
+        .hidden {  
+            display: none;  
+        }  
+
+        .media-container {  
+            display: flex;  
+            flex-direction: column;  
+            gap: 16px;  
+        }  
+
+        .media-wrapper {  
+            position: relative;  
+            border-radius: 16px;  
+            overflow: hidden;  
+            background: #000;  
+        }  
+
+        video {  
+            width: 100%;  
+            display: block;  
+        }  
+
+        .images {  
+            margin-top: 14px;  
+            display: grid;  
+            grid-template-columns: repeat(2, 1fr);  
+            gap: 10px;  
+        }  
+
+        .images img {  
+            width: 100%;  
+            border-radius: 14px;  
+            background: #111;  
+            object-fit: cover;  
+        }  
+
+        .download-btn {  
+            position: absolute;  
+            bottom: 12px;  
+            right: 12px;  
+            background: rgba(229, 9, 20, 0.9);  
+            color: white;  
+            border: none;  
+            padding: 8px 16px;  
+            border-radius: 8px;  
+            font-size: 14px;  
+            font-weight: 500;  
+            cursor: pointer;  
+            transition: background 0.2s ease;  
+            backdrop-filter: blur(4px);  
+        }  
+
+        .download-btn:hover {  
+            background: rgba(229, 9, 20, 1);  
+        }  
+
+        .image-download-btn {  
+            position: absolute;  
+            top: 8px;  
+            right: 8px;  
+            background: rgba(229, 9, 20, 0.9);  
+            color: white;  
+            border: none;  
+            padding: 6px 12px;  
+            border-radius: 6px;  
+            font-size: 12px;  
+            font-weight: 500;  
+            cursor: pointer;  
+            transition: background 0.2s ease;  
+            backdrop-filter: blur(4px);  
+        }  
+
+        .image-download-btn:hover {  
+            background: rgba(229, 9, 20, 1);  
+        }  
+
+        .description {  
+            margin-top: 14px;  
+            font-size: 14px;  
+            line-height: 1.45;  
+            color: #dddddd;  
+        }  
+
+        .image-container {  
+            position: relative;  
+        }  
+    </style>  
+</head>  
+<body>  
+    <div id="blocked" class="blocked">  
+        <div class="blocked-card">  
+            <div class="blocked-title">TikTok Media Save</div>  
+            <div class="blocked-text">  
+                Telegram Mini App for downloading videos and photos from TikTok without watermarks.  
+                <br><br>  
+                The app works <strong>only within Telegram</strong>.  
+            </div>  
+            <a class="blocked-link"  
+               href="https://t.me/TikTokMediaSaveBot/app"  
+               target="_blank"  
+               rel="noopener noreferrer">  
+                Open in Telegram  
+            </a>  
+        </div>  
+    </div>  
+
+    <div id="app" class="app">  
+        <div class="top-bar">  
+            <div class="title">TikTok-App</div>  
+            <div class="search-box">  
+                <input id="tiktokUrl" placeholder="Enter URL...">  
+                <button id="loadBtn">Load</button>  
+            </div>  
+        </div>  
+        <div class="content">  
+            <div id="status" class="status"></div>  
+            <div id="mediaContainer" class="media-container"></div>  
+            <div id="description" class="description"></div>  
+        </div>  
+    </div>  
+
+    <script>  
+        if (!window.Telegram || !Telegram.WebApp || !Telegram.WebApp.initData) {  
+            document.getElementById("blocked").style.display = "flex";  
+            throw new Error("Not Telegram WebApp");  
+        }  
+
+        const tg = Telegram.WebApp;  
+
+        tg.ready();  
+        tg.expand();  
+
+        if (tg.isVersionAtLeast("8.0")) {  
+            tg.requestFullscreen();  
+        }  
+
+        tg.enableClosingConfirmation();  
+        tg.disableVerticalSwipes();  
+        tg.lockOrientation();  
+
+        function syncViewport() {  
+            document.documentElement.style.setProperty(  
+                "--tg-viewport-height",  
+                tg.viewportStableHeight + "px"  
+            );  
+        }  
+
+        syncViewport();  
+
+        tg.onEvent("viewportChanged", e => {  
+            if (e.isStateStable) syncViewport();  
+        });  
+
+        document.getElementById("app").style.display = "flex";  
+
+        const input = document.getElementById("tiktokUrl");  
+        const loadBtn = document.getElementById("loadBtn");  
+        const statusEl = document.getElementById("status");  
+        const mediaContainer = document.getElementById("mediaContainer");  
+        const descEl = document.getElementById("description");  
+
+        loadBtn.onclick = loadTikTok;  
+
+        async function loadTikTok() {  
+            const url = input.value.trim();  
+            if (!url) {  
+                setStatus("Enter TikTok media URL!", true);  
+                return;  
+            }  
+
+            resetUI();  
+            setStatus("Loading...");  
+
+            try {  
+                const res = await fetch(`https://tikwm.com/api/?url=${encodeURIComponent(url)}`);  
+                const json = await res.json();  
+                if (json.code !== 0) throw new Error();  
+                render(json.data);  
+                setStatus("Ready!");  
+            } catch {  
+                setStatus("Loading error!", true);  
+            }  
+        }  
+
+        function render(data) {  
+            mediaContainer.innerHTML = "";  
+            
+            if (data.play) {  
+                // Render video
+                const videoWrapper = document.createElement("div");  
+                videoWrapper.className = "media-wrapper";  
+                
+                const video = document.createElement("video");  
+                video.src = data.play;  
+                video.controls = true;  
+                video.playsInline = true;  
+                
+                const downloadBtn = document.createElement("button");  
+                downloadBtn.className = "download-btn";  
+                downloadBtn.textContent = "Download Video";  
+                downloadBtn.onclick = () => downloadMedia(data.play, "tiktok_video.mp4");  
+                
+                videoWrapper.appendChild(video);  
+                videoWrapper.appendChild(downloadBtn);  
+                mediaContainer.appendChild(videoWrapper);  
+            }  
+
+            if (Array.isArray(data.images) && data.images.length > 0) {  
+                const imagesContainer = document.createElement("div");  
+                imagesContainer.className = "images";  
+                
+                data.images.forEach((src, index) => {  
+                    const imageContainer = document.createElement("div");  
+                    imageContainer.className = "image-container";  
+                    
+                    const img = document.createElement("img");  
+                    img.src = src;  
+                    img.loading = "lazy";  
+                    
+                    const downloadBtn = document.createElement("button");  
+                    downloadBtn.className = "image-download-btn";  
+                    downloadBtn.textContent = "Download";  
+                    downloadBtn.onclick = () => downloadMedia(src, `tiktok_photo_${index + 1}.jpg`);  
+                    
+                    imageContainer.appendChild(img);  
+                    imageContainer.appendChild(downloadBtn);  
+                    imagesContainer.appendChild(imageContainer);  
+                });  
+                
+                mediaContainer.appendChild(imagesContainer);  
+            }  
+
+            descEl.textContent = data.title || "";  
+        }  
+
+        function downloadMedia(url, filename) {  
+            if (!tg.downloadFile) {  
+                alert("Your Telegram app does not support file downloading. Please update to the latest version.");  
+                return;  
+            }  
+
+            tg.downloadFile({  
+                url: url,  
+                filename: filename  
+            }, (accepted) => {  
+                if (accepted) {  
+                    setStatus("Download started...");  
+                } else {  
+                    setStatus("Download cancelled", true);  
+                }  
+                  
+                // Clear status after 3 seconds  
+                setTimeout(() => {  
+                    if (statusEl.textContent.includes("Download")) {  
+                        setStatus("");  
+                    }  
+                }, 3000);  
+            });  
+        }  
+
+        function resetUI() {  
+            mediaContainer.innerHTML = "";  
+            descEl.textContent = "";  
+        }  
+
+        function setStatus(text, error = false) {  
+            statusEl.textContent = text;  
+            statusEl.style.color = error ? "#ff4d4d" : "#aaaaaa";  
+        }  
+
+        // Allow pressing Enter to load
+        input.addEventListener("keypress", (e) => {  
+            if (e.key === "Enter") {  
+                loadTikTok();  
+            }  
+        });  
+    </script>  
+</body>  
 </html>
