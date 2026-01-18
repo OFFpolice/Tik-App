@@ -243,7 +243,7 @@
         </div>
     </div>
 
-    <script>
+    <!--<script>
         // Проверка на запуск внутри Telegram Web App
         if (!window.Telegram || !Telegram.WebApp || !Telegram.WebApp.initData) {
             document.getElementById("blocked").style.display = "flex";
@@ -384,6 +384,173 @@
             statusEl.textContent = text;
             statusEl.style.color = isError ? "#ff4d4d" : "#aaa";
         }
-    </script>
+    </script>-->
+
+<script>
+    // Проверка запуска внутри Telegram Web App
+    if (!window.Telegram || !Telegram.WebApp || !Telegram.WebApp.initData) {
+        document.getElementById("blocked").style.display = "flex";
+        throw new Error("Not in Telegram Web App");
+    }
+
+    const tg = Telegram.WebApp;
+
+    tg.ready();
+    tg.expand();
+    if (tg.isVersionAtLeast("8.0")) tg.requestFullscreen();
+    tg.enableClosingConfirmation();
+    tg.disableVerticalSwipes();
+    tg.lockOrientation();
+
+    // Синхронизация viewport
+    function syncViewport() {
+        document.documentElement.style.setProperty("--tg-viewport-height", tg.viewportStableHeight + "px");
+    }
+    syncViewport();
+    tg.onEvent("viewportChanged", (e) => {
+        if (e.isStateStable) syncViewport();
+    });
+
+    // Показываем основное приложение
+    document.getElementById("app").style.display = "flex";
+
+    // Элементы DOM
+    const input = document.getElementById("tiktokUrl");
+    const loadBtn = document.getElementById("loadBtn");
+    const statusEl = document.getElementById("status");
+    const videoEl = document.getElementById("video");
+    const downloadVideoBtn = document.getElementById("downloadVideo");
+    const imagesEl = document.getElementById("images");
+    const descEl = document.getElementById("description");
+
+    loadBtn.onclick = loadTikTok;
+
+    // Сброс UI
+    function resetUI() {
+        videoEl.classList.add("hidden");
+        downloadVideoBtn.classList.add("hidden");
+        videoEl.src = "";
+        imagesEl.innerHTML = "";
+        descEl.textContent = "";
+    }
+
+    // Статус
+    function setStatus(text, isError = 0) {
+        statusEl.textContent = text;
+        statusEl.style.color = isError ? "#ff4d4d" : "#aaa";
+    }
+
+    // Определение имени файла и MIME-типа
+    function getFileInfo(url, typePrefix = "tiktok") {
+        const extension = url.split('.').pop().toLowerCase();
+        let mime = "application/octet-stream";
+        let name = `${typePrefix}.${extension}`;
+
+        switch (extension) {
+            case "mp4":
+                mime = "video/mp4";
+                name = "tiktok_video.mp4";
+                break;
+            case "mp3":
+                mime = "audio/mpeg";
+                name = "tiktok_audio.mp3";
+                break;
+            case "jpg":
+            case "jpeg":
+                mime = "image/jpeg";
+                break;
+            case "png":
+                mime = "image/png";
+                break;
+        }
+
+        return { name, mime };
+    }
+
+    // Загрузка контента
+    async function loadTikTok() {
+        const url = input.value.trim();
+        if (!url) {
+            setStatus("Enter TikTok media URL!", 1);
+            return;
+        }
+
+        resetUI();
+        setStatus("Loading...");
+
+        try {
+            const response = await fetch("https://tikwm.com/api/?url=" + encodeURIComponent(url));
+            const data = await response.json();
+
+            if (data.code !== 0) throw new Error("API error");
+
+            render(data);
+            setStatus("Ready!");
+        } catch (error) {
+            setStatus("Loading error!", 1);
+        }
+    }
+
+    // Рендеринг контента
+    function render(data) {
+        descEl.textContent = data.title || "";
+
+        // Видео или аудио
+        if (data.play) {
+            const { name, mime } = getFileInfo(data.play);
+            const isVideo = mime.startsWith("video");
+
+            if (isVideo) {
+                videoEl.src = data.play;
+                videoEl.classList.remove("hidden");
+            } else {
+                videoEl.src = "";
+                videoEl.classList.add("hidden");
+            }
+
+            downloadVideoBtn.classList.remove("hidden");
+            downloadVideoBtn.onclick = () => downloadFile(data.play, name, mime);
+        }
+
+        // Изображения
+        imagesEl.innerHTML = "";
+        if (Array.isArray(data.images)) {
+            data.images.forEach((src, i) => {
+                const card = document.createElement("div");
+                card.className = "image-card";
+
+                const img = document.createElement("img");
+                img.src = src;
+                img.alt = `TikTok image ${i + 1}`;
+
+                const btn = document.createElement("button");
+                btn.className = "img-download";
+                btn.type = "button";
+                btn.textContent = "Download";
+
+                btn.onclick = () => {
+                    const ext = src.split('.').pop();
+                    const { mime } = getFileInfo(src);
+                    downloadFile(src, `tiktok_image_${i + 1}.${ext}`, mime);
+                };
+
+                card.append(img, btn);
+                imagesEl.append(card);
+            });
+        }
+    }
+
+    // Загрузка файла через Telegram Web App
+    function downloadFile(url, name, type) {
+        if (!tg.isVersionAtLeast("8.0")) return;
+
+        tg.downloadFile({
+            url: url,
+            file_name: name,
+            mime_type: type
+        });
+    }
+</script>
+
 </body>
 </html>
