@@ -709,13 +709,15 @@ statusEl.style.color=e?"#ff4d4d":"#aaa"
         }
 
         const tg = Telegram.WebApp;
+
         tg.ready();
         tg.expand();
         
         if (tg.isVersionAtLeast("8.0")) {
             tg.requestFullscreen();
         }
-        
+
+        tg.enableClosingConfirmation();
         tg.disableVerticalSwipes();
         tg.lockOrientation();
 
