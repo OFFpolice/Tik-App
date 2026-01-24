@@ -92,7 +92,7 @@
 
         .top-bar {
             padding: calc(var(--tg-safe-area-inset-top) + 14px) 16px 16px;
-            border-bottom: 1px solid var(--tg-theme-bg-color); /*rgba(255, 255, 255, 0.08);*/
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
 
         .title {
@@ -192,8 +192,8 @@
             padding: 8px 0;
             border: none;
             border-radius: 10px;
-            background: rgba(229, 9, 20, 0.95);
-            color: #fff;
+            background: var(--tg-theme-button-color); /*rgba(229, 9, 20, 0.95);*/
+            color: var(--tg-theme-button-text-color, #fff);
             font-size: 13px;
             font-weight: 500;
             cursor: pointer;
