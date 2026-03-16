@@ -113,6 +113,30 @@
             font-weight: 500;
             cursor: pointer;
         }
+        .clear-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #444;
+            color: #fff;
+            font-size: 18px;
+            line-height: 24px;
+            text-align: center;
+            cursor: pointer;
+            display: none;
+            user-select: none;
+            transition: background 0.2s;
+        }
+        .clear-btn:hover {
+            background: #666;
+        }
+        .clear-btn:active {
+            background: #888;
+        }
         .content {
             flex: 1;
             overflow-y: auto;
